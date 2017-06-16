@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the aws cli profile to use
-profile="venicegeo-prod"
+profile="venicegeo"
 
 # Define desired name of log group
 log_group_name="VPC-Flow-Logs"

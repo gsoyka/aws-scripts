@@ -3,11 +3,12 @@
 # Define regions we want to exclude (to address manually)
 used_regions=(
 	us-east-1
-	us-west-2 
+	us-west-1
+	us-west-2
 )
 
 # Define aws cli profile to use
-profile="venicegeo-prod"
+profile="venicegeo"
 
 # Loop over all EC2 regions
 for region in `aws ec2 describe-regions --output text --profile $profile | cut -f3`

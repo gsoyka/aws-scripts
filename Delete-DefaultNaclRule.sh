@@ -3,11 +3,12 @@
 # Define regions we want to exclude
 used_regions=(
 	us-east-1
+	us-west-1
 	us-west-2 
 )
 
 # Define aws cli profile to use
-profile="venicegeo-prod"
+profile="venicegeo"
 
 # Parameter 1 is the Region
 function deleteAllowEgressRules()
