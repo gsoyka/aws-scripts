@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define aws cli profile to use
-profile="venicegeo"
+profile="default"
 
 # Source Functions
 for file in /Users/gsoyka/Projects/aws-scripts/functions/*
