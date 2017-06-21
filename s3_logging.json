@@ -1,0 +1,50 @@
+{
+  "LoggingEnabled": {
+    "TargetBucket": "venicegeo-s3-logs",
+    "TargetPrefix": "grant-testing-bucket/",
+    "TargetGrants": [
+      {
+        "Grantee": {
+          "Type": "CanonicalUser",
+          "DisplayName": "aws.geoint",
+          "ID": "31d89f79718dbd4e67090740e6fa5e41cffade7d9a3c323c85b525342e6341ee"
+        },
+        "Permission": "FULL_CONTROL"
+      },
+      {
+        "Grantee": {
+          "Type": "Group",
+          "URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+        },
+        "Permission": "READ"
+      }
+    ]
+  }
+}
+
+
+		json_config=$(jq -n --arg target_prefix "$bucket_prefix" '
+		{
+			"LoggingEnabled": {
+				"TargetBucket": "venicegeo-s3-logs",
+				"TargetPrefix": $target_prefix,
+				"TargetGrants": [
+					{
+						"Grantee": {
+							"Type": "CanonicalUser",
+							"DisplayName": "aws.geoint",
+							"ID": "31d89f79718dbd4e67090740e6fa5e41cffade7d9a3c323c85b525342e6341ee"
+						},
+						"Permission": "FULL_CONTROL"
+					},
+					{
+						"Grantee": {
+							"Type": "Group",
+							"URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+						},
+						"Permission": "READ"
+					}				
+				]
+			}
+		}'
+		)

@@ -22,4 +22,3 @@ function size_buckets {
 }
 
 size_buckets "venicegeo-s3-logs"
-size_buckets

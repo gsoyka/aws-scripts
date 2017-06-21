@@ -17,7 +17,8 @@ function Enable-VpcFlowLogs {
 	if [ -z $arn ]
 	then
 		echo "Role $role_name does not exist, creating"
-		#arn=$(aws iam create-role --profile $profile --role-name $role_name --assume-role-policy-document file://FlowLogsRole-Policy.json | jq '.Role[] | .Arn')
+		arn=$(aws iam create-role --profile $profile --role-name $role_name --assume-role-policy-document file://RolePolicy.json | jq '.Role[] | .Arn')
+		aws iam put-role-policy --profile $profile --role-name $role_name --policy-name $role_name --policy-document file://FlowLogsPolicy.json
 	else
 		echo "Found Existing ARN: $arn"		
 	fi	
