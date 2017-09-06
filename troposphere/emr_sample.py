@@ -27,7 +27,7 @@ parameters = {
     "KeyName",
     Description = "Name of the SSH Key",
     Type = "AWS::EC2::KeyPair::KeyName",
-    Default = "mrgeo",
+    Default = "",
     ),
   "EMRRelease" : Parameter(
     "EMRRelease",
