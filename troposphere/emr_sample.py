@@ -27,26 +27,38 @@ parameters = {
     "KeyName",
     Description = "Name of the SSH Key",
     Type = "AWS::EC2::KeyPair::KeyName",
-    Default = "",
+    Default = "mrgeo",
     ),
   "EMRRelease" : Parameter(
     "EMRRelease",
     Description = "EMR Release Version",
     Type = "String",
-    Default = "emr-5.6.0",
+    Default = "emr-5.8.0",
     ),
-#  "InstanceType" : Parameter(
-#    "InstanceType",
-#    Type="String",
-#    Description="EC2 instance type",
-#    Default="m4.large",
-#    AllowedValues=[
-#      "m1.medium", "m1.large", "m1.xlarge",
-#      "m4.large", "m4.xlarge",
-#      "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "c1.medium", "c1.xlarge",
-#    ],
-#    ConstraintDescription="Must be an EC2 instance type supported by EMR",
-#    ),      
+  "EMRRole" : Parameter(
+    "EMRRole",
+    Description = "ARN of existing EMR Role",
+    Type = "String",
+    Default = "EMR_DefaultRole",
+    ),
+  "EMRInstanceProfile" : Parameter(
+    "EMRInstanceProfile",
+    Description = "ARN of existing EMR Instance Profile",
+    Type = "String",
+    Default = "EMR_EC2_DefaultRole",
+    ),    
+  "InstanceType" : Parameter(
+    "InstanceType",
+    Type="String",
+    Description="EC2 instance type",
+    Default="m4.large",
+    AllowedValues=[
+      "m1.medium", "m1.large", "m1.xlarge",
+      "m4.large", "m4.xlarge",
+      "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "c1.medium", "c1.xlarge",
+    ],
+    ConstraintDescription="Must be an EC2 instance type supported by EMR",
+    ),      
 }
 #withSpotPrice = "WithSpotPrice"
 #template.add_condition(withSpotPrice, Not(Equals(Ref(spot), "0")))
@@ -106,66 +118,14 @@ def generate_scaling_rules(rules_name):
   ]
   return rules
     
-
-
-# IAM roles required by EMR
-def gen_emr_role():
-  emr_role = iam.Role(
-    'EMRServiceRole',
-    AssumeRolePolicyDocument={
-      "Statement": [{
-        "Effect": "Allow",
-        "Principal": {
-          "Service": [
-            "elasticmapreduce.amazonaws.com"
-          ]
-        },
-        "Action": ["sts:AssumeRole"]
-      }]
-    },
-    ManagedPolicyArns=[
-      'arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole'
-    ]
-  )
-  return emr_role
-
-#emr_autoscaling_role = "EMR_AutoScaling_DefaultRole"
-#
-def gen_emr_instance_role():
-  emr_instance_role = iam.Role(
-    "EMRInstanceRole",
-    AssumeRolePolicyDocument={
-      "Statement": [{
-        "Effect": "Allow",
-        "Principal": {
-          "Service": [
-            "ec2.amazonaws.com"
-          ]
-        },
-        "Action": ["sts:AssumeRole"]
-      }]
-    },
-    ManagedPolicyArns=[
-      'arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforEC2Role'
-    ]
-  )
-  return emr_instance_role
-
-def gen_emr_instance_profile( instance_role_name ):
-  instance_profile = iam.InstanceProfile(
-    "EMRInstanceProfile",
-    Roles=[Ref(instance_role_name)]
-    )
-  return instance_profile
-
 def gen_cluster( cluster_name ):
   cluster = emr.Cluster(
     cluster_name,
     Name=cluster_name,
     ReleaseLabel=Ref(parameters["EMRRelease"]),
 
-    JobFlowRole=Ref("EMRInstanceProfile"),
-    ServiceRole=Ref("EMRServiceRole"),
+    JobFlowRole=Ref(parameters["EMRInstanceProfile"]),
+    ServiceRole=Ref(parameters["EMRRole"]),
 
     Instances=emr.JobFlowInstancesConfig(
       Ec2KeyName=Ref(parameters["KeyName"]),
@@ -173,7 +133,7 @@ def gen_cluster( cluster_name ):
       MasterInstanceGroup=emr.InstanceGroupConfigProperty(
         Name="Master Instance",
         InstanceCount="1",
-        InstanceType=M4_LARGE,
+        InstanceType=Ref(parameters["InstanceType"]),
         Market="ON_DEMAND",
       ),
       CoreInstanceGroup=emr.InstanceGroupConfigProperty(
@@ -229,9 +189,6 @@ def main(argv):
   for p in parameters.values():
     t.add_parameter(p)
   
-  t.add_resource(gen_emr_instance_role())
-  t.add_resource(gen_emr_role())
-  t.add_resource(gen_emr_instance_profile("EMRInstanceRole"))
   t.add_resource(gen_cluster("EMRSampleCluster"))
   
   # Convert template to json
