@@ -46,3 +46,6 @@ Create-DefaultKey $profile
 
 # Disable access keys that have not been used in 90 days
 Disable-InactiveAccessKeys $profile
+
+# Set IAM Password Policy
+Set-IAMPasswordPolicy
